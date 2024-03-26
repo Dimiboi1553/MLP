@@ -27,13 +27,20 @@ class Neuron():
         return self.Input
     
     def Backward(self, Gradient, learning_rate, Inputs):
-        print(Inputs)
-        #TODO RIGHT NOW INPUTS IS A 2D LIST OF THE INPUTS ITS EXPECTING A 1D
-        weight_gradients = [Gradient * i for i in Inputs]
+        sum_weight_gradients = [0 for _ in self.ConnectionWeights]
+    
+        #Iterate over each instance in the batch
+        for input_vector in Inputs:
+            #Calculate weight gradients for the current input and add to the sum
+            for i, input_val in enumerate(input_vector):
+                sum_weight_gradients[i] += Gradient * input_val
         
-        #Update weights
-        for x in range(len(self.ConnectionWeights)):
-            self.ConnectionWeights[x] += learning_rate * weight_gradients[x]
+        #Calculate the average gradient for each weight
+        avg_weight_gradients = [sum_grad / len(Inputs) for sum_grad in sum_weight_gradients]
+        
+        # Update weights with the average gradient
+        for i in range(len(self.ConnectionWeights)):
+            self.ConnectionWeights[i] += learning_rate * avg_weight_gradients[i]
 
         #Update bias
         self.Bias -= learning_rate * Gradient

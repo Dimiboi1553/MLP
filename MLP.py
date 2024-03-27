@@ -20,10 +20,15 @@ class MLP():
 
         #Output Layer we will define this in _init_Layers
         self.OutputLayer = None
+        
+        #Outputs
+        self.NoOfOutputs = NoOfOutputs
 
         #Hidden Layers
         self._init_Layers(HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons)
-
+        
+        #Loss
+        self.Loss = 0
 
     def _init_Layers(self, HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons):
         # NeuronsPerLayer is a list showing the Neurons per layer e.g [32,64,128] Hidden Layer 1 will have 32, Layer 2 64 and Layer 3 128
@@ -65,7 +70,7 @@ class MLP():
         Inputs = []
 
         for i in range(Epochs):
-            Loss = 0
+            self.Loss = 0
 
             #Step 1: Forward pass
             for j, x in enumerate(X):
@@ -77,38 +82,35 @@ class MLP():
                 OutputValues.append(self.Forward(x))
 
                 #Step 2: Backwards pass per Frequency outputs batches
-                if len(OutputValues) == (Frequency -1):
+                if len(OutputValues) % (Frequency) == 0:
                     #Calculate loss only if it's time to calculate
-                    Loss += self.CalculateSlope(OutputValues, TargetValues, Inputs)
+                    Total_Error = self.CalculateSlope(OutputValues, TargetValues)
+                    self.Loss += Total_Error
+                    self.Backpropagation(Total_Error, Inputs)
+
                     OutputValues.clear()
                     TargetValues.clear()
                     Inputs.clear()
-            
-            #Calculate average loss for the entire epoch
-            Loss /= (len(X) // Frequency)
 
             if Verbose != 0 and i % Verbose == 0:
-                print(f"Total Loss: {Loss}, Epoch: {i}")
+                print(f"Total Loss: {self.Loss}, Epoch: {i}")
 
-    def CalculateSlope(self, Outputs, Targets, Inputs):
-        print("i")
+    def CalculateSlope(self, Outputs, Targets):
         # There are two cases 1: regression model use MSE
-        if len(self.OutputLayer.Outputs) == 1:
+        if self.NoOfOutputs == 1:
             Total_Error = 0
-            
+
             for x, i in enumerate(Outputs):
                 y = Targets[x][0]  # Target Value
                 # i is our observed value
                 Total_Error += (y - i)**2
 
-            Total_Error /= len(Outputs)
-            print(Total_Error)
-            self.Backpropagation(Total_Error, Inputs)
+            Total_Error = Total_Error / len(Outputs)
             
             return Total_Error
         
     def Backpropagation(self, Gradient, Inputs):
-        for Layers in self.Layers:
+        for Layers in reversed(self.Layers):
             Layers.Backpropagation(Gradient, self.Learning_rate, Inputs)
 
 def load_data():
@@ -121,7 +123,7 @@ def load_data():
     X_scaled = scaler.fit_transform(X)
 
     # Split the normalized dataset into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.5, random_state=42)
 
     return X_train, X_test, y_train, y_test
 
@@ -130,8 +132,8 @@ def test_mlp():
     X_train, X_test, y_train, y_test = load_data()
 
     # Define the architecture of the MLP
-    hidden_layers = 1
-    neurons_per_layer = [10]  # Adjust the number of neurons as needed
+    hidden_layers = 2
+    neurons_per_layer = [10, 10]  # Adjust the number of neurons as needed
     num_outputs = 1  # Adjust the number of output neurons as needed
 
     # Create an instance of the MLP

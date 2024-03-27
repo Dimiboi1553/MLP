@@ -46,4 +46,9 @@ class Neuron():
         self.Bias -= learning_rate * Gradient
 
     def Sigmoid(self, x):
-        return 1 / (1 + math.exp(-x))
+        try:
+            Total =  1 / (1 + math.exp(-x))
+        except:
+            Total = 1
+        
+        return Total

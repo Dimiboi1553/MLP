@@ -1,10 +1,10 @@
 from Neuron import *
 
 class HiddenLayer():
-    def __init__(self, NeuronCount, PreviousLayerNeuronCount):
+    def __init__(self, NeuronCount, PreviousLayerNeuronCount, Name):
         self.Neurons = []
         self.InputsForNextLayer = []
-
+        self.Name = Name
         self.init_Neurons(NeuronCount, PreviousLayerNeuronCount)
 
     def init_Neurons(self, NeuronCount, PreviousLayerNeuronCount):
@@ -16,10 +16,8 @@ class HiddenLayer():
         self.InputsForNextLayer.clear()
 
         Inputs = PreviousLayer.GetInputsForNextLayer()
-
         for Neuron in self.Neurons:
             self.InputsForNextLayer.append(Neuron.Forward(Inputs))
-
 
     def Backpropagation(self, Gradient, learning_rate, Inputs):
         #Update weights according to Gradient

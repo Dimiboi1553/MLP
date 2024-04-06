@@ -18,8 +18,9 @@ class OutputLayer():
 
     def Forward(self, PreviousLayer):
         Inputs = PreviousLayer.GetInputsForNextLayer()
-        #print(Inputs,"Inputs Output")
-        
+
+        self.Outputs.clear()
+
         for Neuron in self.Neurons:
             self.Outputs.append(Neuron.Forward(Inputs))
         

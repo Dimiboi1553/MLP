@@ -8,43 +8,37 @@ class Neuron():
         
         self.initWeights(In)
         
-        self.Input = 0
+
+        self.Output = 0
 
     def initWeights(self, In):
         for i in range(In):
             self.ConnectionWeights.append(random.uniform(-1, 1))
 
     def Forward(self, Inputs):
-        Input = 0
+        InputForNeuron = 0
 
         for x,i in enumerate(Inputs):
-            Input += (self.ConnectionWeights[x] * i)
+            InputForNeuron += self.ConnectionWeights[x] * i
+
+        InputForNeuron += self.Bias
+
+        self.Output = self.Sigmoid(InputForNeuron)
         
-        Input += self.Bias
-
-        self.Input = self.Sigmoid(Input)
-
-        return self.Input
+        return self.Output
     
     def Backward(self, Gradient, learning_rate, Inputs):
-        sum_weight_gradients = [0 for _ in self.ConnectionWeights]
+        # Calculate the gradient of the sigmoid function
+        sigmoid_gradient = self.Output * (1 - self.Output)
+        
+        # Update bias using the gradient
+        self.Bias -= learning_rate * Gradient * sigmoid_gradient
+        
+        #Update weights using the gradient
+        for i, weight in enumerate(self.ConnectionWeights):
+            weight_gradient = Gradient * Inputs[i] * sigmoid_gradient
+            self.ConnectionWeights[i] -= learning_rate * weight_gradient
     
-        #Iterate over each instance in the batch
-        for input_vector in Inputs:
-            #Calculate weight gradients for the current input and add to the sum
-            for i, input_val in enumerate(input_vector):
-                sum_weight_gradients[i] += Gradient * input_val
-        
-        #Calculate the average gradient for each weight
-        avg_weight_gradients = [sum_grad / len(Inputs) for sum_grad in sum_weight_gradients]
-        
-        # Update weights with the average gradient
-        for i in range(len(self.ConnectionWeights)):
-            self.ConnectionWeights[i] += learning_rate * avg_weight_gradients[i]
-
-        #Update bias
-        self.Bias -= learning_rate * Gradient
-
     def Sigmoid(self, x):
         try:
             Total =  1 / (1 + math.exp(-x))

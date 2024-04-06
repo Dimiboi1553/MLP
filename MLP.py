@@ -1,6 +1,7 @@
 from HiddenLayer import *
 from InputLayer import *
 from OutputLayer import *
+
 from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -37,10 +38,9 @@ class MLP():
         
         PrevLayerNeurons = InputLayerNeurons
 
-        for Neurons in NeuronsPerLayer:
+        for x,Neurons in enumerate(NeuronsPerLayer):
 
-            #print(f"{Neurons}, {PrevLayerNeurons}")
-            self.Layers.append(HiddenLayer(Neurons, PrevLayerNeurons))
+            self.Layers.append(HiddenLayer(Neurons, PrevLayerNeurons,x))
 
             PrevLayerNeurons = Neurons
 
@@ -52,10 +52,8 @@ class MLP():
         self.InputLayer.Forward(Input)
 
         #Do the forward propagation through the hidden layers
-
-        for i in range(1, len(self.Layers)):
+        for i in range(1, len(self.Layers)-1):
             self.Layers[i].Forward(self.Layers[i-1])
-
         #Finally, use the output layer to get the output layer
         Output = self.OutputLayer.Forward(self.Layers[-1])
 
@@ -65,23 +63,13 @@ class MLP():
         if len(X) != len(Y):
             raise ValueError("Training data is unequal x != y")
         
-        OutputValues = []
-        TargetValues = []
-        Inputs = []
-
         for i in range(Epochs):
             self.Loss = 0
 
             #Step 1: Forward pass
             for j, x in enumerate(X):
-                #Add Y to target values
-                TargetValues.append(Y[j])  # Target value
-                #Add x sublist to Inputs
-                Inputs.append(x)
-                #x is already defined as the sublist
-                OutputValues.append(self.Forward(x))
-
                 #Step 2: Backwards pass per Frequency outputs batches
+<<<<<<< HEAD
                 if len(OutputValues) % (Frequency) == 0:
                     #Calculate loss only if it's time to calculate
                     Total_Error = self.CalculateSlope(OutputValues, TargetValues)
@@ -91,10 +79,19 @@ class MLP():
                     OutputValues.clear()
                     TargetValues.clear()
                     Inputs.clear()
+=======
+                Gradient = self.CalculateSlope(self.Forward(x), Y[j], x)
+                Loss += Gradient
+
+                self.Backpropagation(Gradient, x)
+            #Calculate average loss for the entire epoch
+            Loss = Loss / (len(X) // 32)
+>>>>>>> a1e256a (smth)
 
             if Verbose != 0 and i % Verbose == 0:
                 print(f"Total Loss: {self.Loss}, Epoch: {i}")
 
+<<<<<<< HEAD
     def CalculateSlope(self, Outputs, Targets):
         # There are two cases 1: regression model use MSE
         if self.NoOfOutputs == 1:
@@ -112,6 +109,19 @@ class MLP():
     def Backpropagation(self, Gradient, Inputs):
         for Layers in reversed(self.Layers):
             Layers.Backpropagation(Gradient, self.Learning_rate, Inputs)
+=======
+    def CalculateSlope(self, Output, Target, Input):
+        # There are two cases 1: regression model use MSE
+        Total_Error = ((Target - Output)**2)
+
+        Total_Error *= -2
+        
+        return Total_Error
+        
+    def Backpropagation(self, Gradient, Input):
+        for Layers in self.Layers:
+            Layers.Backpropagation(Gradient, self.Learning_rate, Input)
+>>>>>>> a1e256a (smth)
 
 def load_data():
     # Load the California Housing dataset
@@ -140,7 +150,7 @@ def test_mlp():
     my_mlp = MLP(hidden_layers, neurons_per_layer, num_outputs, X_train.shape[1])
 
     # Train the MLP
-    my_mlp.Learn(X_train, y_train.reshape(-1, 1), Epochs=100, Verbose=1, Frequency=1)
+    my_mlp.Learn(X_train, y_train.reshape(-1, 1), Epochs=100, Verbose=1, Frequency=32)
 
 # Run the test case
 test_mlp()

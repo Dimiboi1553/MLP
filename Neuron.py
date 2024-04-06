@@ -8,7 +8,6 @@ class Neuron():
         
         self.initWeights(In)
         
-
         self.Output = 0
 
     def initWeights(self, In):
@@ -27,18 +26,19 @@ class Neuron():
         
         return self.Output
     
-    def Backward(self, Gradient, learning_rate, Inputs):
+    def Backward(self, Output, Target, learning_rate, Input):
+        dMSE = -2 * (Output - Target)
+
         # Calculate the gradient of the sigmoid function
         sigmoid_gradient = self.Output * (1 - self.Output)
         
         # Update bias using the gradient
-        self.Bias -= learning_rate * Gradient * sigmoid_gradient
+        self.Bias -= learning_rate * dMSE * sigmoid_gradient
         
         #Update weights using the gradient
-        for i, weight in enumerate(self.ConnectionWeights):
-            weight_gradient = Gradient * Inputs[i] * sigmoid_gradient
-            self.ConnectionWeights[i] -= learning_rate * weight_gradient
-    
+        for i in range(0, len(self.ConnectionWeights)):
+            self.ConnectionWeights[i] = self.ConnectionWeights[i] - learning_rate * dMSE
+
     def Sigmoid(self, x):
         try:
             Total =  1 / (1 + math.exp(-x))

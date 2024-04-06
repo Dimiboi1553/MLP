@@ -1,6 +1,7 @@
 from HiddenLayer import *
 from InputLayer import *
 from OutputLayer import *
+from BackpropgationFunctions import *
 
 from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
@@ -10,7 +11,6 @@ class MLP():
     def __init__(self, HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons ,learning_rate=0.01):
         #Define Lr
         self.Learning_rate = learning_rate
-
         #No of Outputs determines the type of MLP(Classification or regression)
         #Define the Layers
         self.Layers = []
@@ -64,27 +64,20 @@ class MLP():
             #Step 1: Forward pass
             for j, x in enumerate(X):
                 #Step 2: Backwards pass per Frequency outputs batches
-                Gradient = self.CalculateSlope(self.Forward(x), Y[j], x)
-                Loss += Gradient
-
-                self.Backpropagation(Gradient, x)
+                Forward = self.Forward(x)
+                
+                Loss += MSE(Y[j], Forward)
+                self.Backpropagation(Forward, Y[j], x)
+                
             #Calculate average loss for the entire epoch
             Loss = Loss / (len(X) // 32)
 
             if Verbose != 0 and i % Verbose == 0:
                 print(f"Total Loss: {Loss}, Epoch: {i}")
-
-    def CalculateSlope(self, Output, Target, Input):
-        # There are two cases 1: regression model use MSE
-        Total_Error = ((Target - Output)**2)
-
-        Total_Error *= -2
         
-        return Total_Error
-        
-    def Backpropagation(self, Gradient, Input):
+    def Backpropagation(self, Output, Target, Input):
         for Layers in self.Layers:
-            Layers.Backpropagation(Gradient, self.Learning_rate, Input)
+            Layers.Backpropagation(Output, Target, self.Learning_rate, Input)
 
 def load_data():
     # Load the California Housing dataset
@@ -105,8 +98,8 @@ def test_mlp():
     X_train, X_test, y_train, y_test = load_data()
 
     # Define the architecture of the MLP
-    hidden_layers = 1
-    neurons_per_layer = [10]  # Adjust the number of neurons as needed
+    hidden_layers = 2
+    neurons_per_layer = [10,10]  # Adjust the number of neurons as needed
     num_outputs = 1  # Adjust the number of output neurons as needed
 
     # Create an instance of the MLP

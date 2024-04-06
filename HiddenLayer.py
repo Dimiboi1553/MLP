@@ -21,6 +21,7 @@ class HiddenLayer():
 
     def Backpropagation(self, Output, Target, Learning_rate, Input):
         #Update weights according to Gradient
+        #print("\n")
         for neurons in self.Neurons:
             neurons.Backward(Output, Target, Learning_rate, Input)
     

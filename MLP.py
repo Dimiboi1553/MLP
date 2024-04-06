@@ -62,15 +62,17 @@ class MLP():
             Loss = 0
 
             #Step 1: Forward pass
+            #TODO FIX LOOPING ISSUES:
+            #The weights are being updated in neurons and hidden layers but it is using the old weights so Loss doesnt change.
             for j, x in enumerate(X):
                 #Step 2: Backwards pass per Frequency outputs batches
                 Forward = self.Forward(x)
                 
                 Loss += MSE(Y[j], Forward)
                 self.Backpropagation(Forward, Y[j], x)
-                
+
             #Calculate average loss for the entire epoch
-            Loss = Loss / (len(X) // 32)
+            Loss = Loss / len(X)
 
             if Verbose != 0 and i % Verbose == 0:
                 print(f"Total Loss: {Loss}, Epoch: {i}")
@@ -98,8 +100,8 @@ def test_mlp():
     X_train, X_test, y_train, y_test = load_data()
 
     # Define the architecture of the MLP
-    hidden_layers = 2
-    neurons_per_layer = [10,10]  # Adjust the number of neurons as needed
+    hidden_layers = 1
+    neurons_per_layer = [10]  # Adjust the number of neurons as needed
     num_outputs = 1  # Adjust the number of output neurons as needed
 
     # Create an instance of the MLP

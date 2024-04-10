@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 class MLP():
-    def __init__(self, HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons ,learning_rate=0.01):
+    def __init__(self, HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons ,learning_rate=0.1):
         #Define Lr
         self.Learning_rate = learning_rate
         #No of Outputs determines the type of MLP(Classification or regression)
@@ -35,7 +35,7 @@ class MLP():
 
         for x,Neurons in enumerate(NeuronsPerLayer):
 
-            self.Layers.append(HiddenLayer(Neurons, PrevLayerNeurons,x))
+            self.Layers.append(HiddenLayer(Neurons, PrevLayerNeurons, x))
 
             PrevLayerNeurons = Neurons
 
@@ -45,10 +45,11 @@ class MLP():
     def Forward(self, Input):
         #Give the InputLayer the input
         self.InputLayer.Forward(Input)
-
+        
         #Do the forward propagation through the hidden layers
-        for i in range(1, len(self.Layers)-1):
-            self.Layers[i].Forward(self.Layers[i-1])
+        for i in range(0, len(self.Layers)):
+            self.Layers[i].Forward(self.Layers[i])
+            
         #Finally, use the output layer to get the output layer
         Output = self.OutputLayer.Forward(self.Layers[-1])
 
@@ -65,12 +66,14 @@ class MLP():
             #TODO FIX LOOPING ISSUES:
             #The weights are being updated in neurons and hidden layers but it is using the old weights so Loss doesnt change.
             for j, x in enumerate(X):
-                #Step 2: Backwards pass per Frequency outputs batches
+                #Step 1: Forward Pass
                 Forward = self.Forward(x)
-                
-                Loss += MSE(Y[j], Forward)
-                self.Backpropagation(Forward, Y[j], x)
 
+                Loss += MSE(Y[j], Forward)
+                # print("\n")
+                # print("Backpropcalled")
+                self.Backpropagation(Forward, Y[j], x)
+                Forward = 0
             #Calculate average loss for the entire epoch
             Loss = Loss / len(X)
 
@@ -101,7 +104,7 @@ def test_mlp():
 
     # Define the architecture of the MLP
     hidden_layers = 1
-    neurons_per_layer = [10]  # Adjust the number of neurons as needed
+    neurons_per_layer = [5]  # Adjust the number of neurons as needed
     num_outputs = 1  # Adjust the number of output neurons as needed
 
     # Create an instance of the MLP

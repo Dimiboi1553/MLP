@@ -18,7 +18,7 @@ class Neuron():
         InputForNeuron = 0
 
         for x,i in enumerate(Inputs):
-            InputForNeuron += self.ConnectionWeights[x] * i
+            InputForNeuron += self.ConnectionWeights[x-1] * i
 
         InputForNeuron += self.Bias
 
@@ -36,13 +36,7 @@ class Neuron():
         self.Bias -= learning_rate * dMSE * sigmoid_gradient
         
         #Update weights using the gradient
-
         for i in range(0, len(self.ConnectionWeights)):
-            # if i == 0:
-            #     oldweight = self.ConnectionWeights[i]
-                #self.ConnectionWeights[i] = self.ConnectionWeights[i] - learning_rate * dMSE
-                #print(f"New Weight{self.ConnectionWeights[i] - learning_rate * dMSE}, Old Weight {oldweight}")
-
             self.ConnectionWeights[i] = self.ConnectionWeights[i] - learning_rate * dMSE
 
     def Sigmoid(self, x):

@@ -23,8 +23,8 @@ class OutputLayer():
 
         for Neuron in self.Neurons:
             self.Outputs.append(Neuron.Forward(Inputs))
-        
-        if len(self.Neurons) > 1:
+
+        if len(self.Neurons) >= 2:
             #If more than 1 Neuron than Classification problem
             return self.Softmax()
         else:

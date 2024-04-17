@@ -1,6 +1,4 @@
-import math
-
-def MSE(actual,predicted):
+def MSE(actual, predicted):
     return ((actual - predicted) ** 2)
 
 def MSE_Gradient(actual,predicted):

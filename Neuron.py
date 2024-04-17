@@ -26,20 +26,21 @@ class Neuron():
         
         return self.Output
     
-    def Backward(self, Output, Target, learning_rate, Input):
-        dMSE = -2 * (Output - Target)
+    def Backward(self, Output, Y, learning_rate):
+        dMSE = -2 * (Output - Y)
 
-        # Calculate the gradient of the sigmoid function
+        #Calculate the gradient of the sigmoid function
         sigmoid_gradient = self.Output * (1 - self.Output)
         
-        # Update bias using the gradient
+        #Update bias using the gradient
         self.Bias -= learning_rate * dMSE * sigmoid_gradient
         
         #Update weights using the gradient
         for i in range(0, len(self.ConnectionWeights)):
-            self.ConnectionWeights[i] = self.ConnectionWeights[i] - learning_rate * dMSE
+            self.ConnectionWeights[i] -= learning_rate * dMSE
 
     def Sigmoid(self, x):
+        #Total = max((0.1 * x), x)
         try:
             Total =  1 / (1 + math.exp(-x))
         except:

@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 class MLP():
-    def __init__(self, HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons ,learning_rate=0.1):
+    def __init__(self, HiddenLayers, NeuronsPerLayer, NoOfOutputs, InputLayerNeurons ,learning_rate=0.01):
         #Define Lr
         self.Learning_rate = learning_rate
         #No of Outputs determines the type of MLP(Classification or regression)
@@ -39,7 +39,7 @@ class MLP():
 
             PrevLayerNeurons = Neurons
 
-        # Ok, we added all hidden Layers. Let's add the OutputLayer.
+        #Ok, we added all hidden Layers. Let's add the OutputLayer.
         self.OutputLayer = OutputLayer(NoOfOutputs, NeuronsPerLayer[-1])
     
     def Forward(self, Input):
@@ -47,42 +47,42 @@ class MLP():
         self.InputLayer.Forward(Input)
         
         #Do the forward propagation through the hidden layers
-        for i in range(0, len(self.Layers)):
-            self.Layers[i].Forward(self.Layers[i])
+        for i in range(1, len(self.Layers)):
+            self.Layers[i].Forward(self.Layers[i-1])
             
         #Finally, use the output layer to get the output layer
         Output = self.OutputLayer.Forward(self.Layers[-1])
 
         return Output
 
-    def Learn(self, X, Y, Epochs, Verbose=0, Frequency=32):
+    def Learn(self, X, Y, Epochs, Verbose=0):
         if len(X) != len(Y):
-            raise ValueError("Training data is unequal x != y")
-        
+            raise ValueError("Training data is unequal len(x) != len(y)")
+
         for i in range(Epochs):
             Loss = 0
-
-            #Step 1: Forward pass
-            #TODO FIX LOOPING ISSUES:
-            #The weights are being updated in neurons and hidden layers but it is using the old weights so Loss doesnt change.
+            
+            
+            #Forward pass
             for j, x in enumerate(X):
                 #Step 1: Forward Pass
                 Forward = self.Forward(x)
 
+                #Calc loss
                 Loss += MSE(Y[j], Forward)
-                # print("\n")
-                # print("Backpropcalled")
-                self.Backpropagation(Forward, Y[j], x)
-                Forward = 0
+            
+                #Call backprop
+                self.Backpropagation(Y[j], Forward)
+
             #Calculate average loss for the entire epoch
             Loss = Loss / len(X)
 
             if Verbose != 0 and i % Verbose == 0:
-                print(f"Total Loss: {Loss}, Epoch: {i}")
+                print(f"Average Loss: {Loss}, Epoch: {i}")
         
-    def Backpropagation(self, Output, Target, Input):
+    def Backpropagation(self, Output, Target):
         for Layers in self.Layers:
-            Layers.Backpropagation(Output, Target, self.Learning_rate, Input)
+            Layers.Backpropagation(Output, Target, self.Learning_rate)
 
 def load_data():
     # Load the California Housing dataset
@@ -111,7 +111,7 @@ def test_mlp():
     my_mlp = MLP(hidden_layers, neurons_per_layer, num_outputs, X_train.shape[1])
 
     # Train the MLP
-    my_mlp.Learn(X_train, y_train.reshape(-1, 1), Epochs=100, Verbose=1, Frequency=32)
+    my_mlp.Learn(X_train, y_train.reshape(-1, 1), Epochs=100, Verbose=1)
 
-# Run the test case
+#Run the test case
 test_mlp()

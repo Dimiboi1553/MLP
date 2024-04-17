@@ -9,5 +9,5 @@ class InputLayer():
     def GetInputsForNextLayer(self):
         return self.InputsForOtherLayers
 
-    def Backpropagation(self, Gradient, learning_rate, Inputs, e):
+    def Backpropagation(self, Gradient, learning_rate, Inputs):
         pass

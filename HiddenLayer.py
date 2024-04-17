@@ -16,14 +16,15 @@ class HiddenLayer():
         self.InputsForNextLayer.clear()
 
         Inputs = PreviousLayer.GetInputsForNextLayer()
+        #print(f"Inputs {Inputs}")
 
         for Neuron in self.Neurons:
             self.InputsForNextLayer.append(Neuron.Forward(Inputs))
 
-    def Backpropagation(self, Output, Target, Learning_rate, Input):
+    def Backpropagation(self, Output, Target, Learning_rate):
         #Update weights according to Gradient
         for neurons in self.Neurons:
-            neurons.Backward(Output, Target, Learning_rate, Input)
+            neurons.Backward(Output, Target, Learning_rate)
     
     def GetInputsForNextLayer(self):
         return self.InputsForNextLayer 
